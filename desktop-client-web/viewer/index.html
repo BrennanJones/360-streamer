@@ -1,0 +1,28 @@
+<html>
+
+<head>
+  <title>360 Video Stream Viewer</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="../lib/js/jquery.min.js"></script>
+  <script type="text/javascript" src="../lib/js/peer.js"></script>
+  <script type="text/javascript" src="../lib/js/three.min.js"></script>
+  <script type="text/javascript" src="../js/thetaview.js"></script>
+</head>
+
+<body>
+
+  <div class="videoContainer" id="videoContainer">
+    <video class="theirVideo" id="theirVideo" autoplay></video>
+    <video class="myVideo" id="myVideo" muted="true" autoplay></video>
+  </div>
+
+  <script type="text/javascript">
+    window.clientType = 'Viewer';
+  </script>
+
+  <script type="text/javascript" src="../js/main.js"></script>
+
+</body>
+
+</html>
