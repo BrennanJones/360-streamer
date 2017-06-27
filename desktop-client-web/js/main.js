@@ -71,7 +71,10 @@ jQuery(function()
       if (window.existingCall)
       {
         window.existingCall.close();
-        stop360();
+        if (clientType == 'Viewer')
+        {
+          stop360();
+        }
       }
     }
   });
