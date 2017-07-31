@@ -95,14 +95,49 @@ class ThetaView {
     this._timer = requestAnimationFrame(this._animate.bind(this));
     if (this._camera === null) return;
 
-    this._lat = Math.max(-85, Math.min(85, this._lat));
-    const phi = THREE.Math.degToRad(90 - this._lat);
-    const theta = THREE.Math.degToRad(this._lon);
-    this._camera.target.x = 500 * Math.sin(phi) * Math.cos(theta);
-    this._camera.target.y = 500 * Math.cos(phi);
-    this._camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
-    this._camera.lookAt(this._camera.target);
-    this._renderer.render(this._scene, this._camera);
+    // this._lat = Math.max(-85, Math.min(85, this._lat));
+    // const phi = THREE.Math.degToRad(90 - this._lat);
+    // const theta = THREE.Math.degToRad(this._lon);
+    // this._camera.target.x = 500 * Math.sin(phi) * Math.cos(theta);
+    // this._camera.target.y = 500 * Math.cos(phi);
+    // this._camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
+    // this._camera.lookAt(this._camera.target);
+    // this._renderer.render(this._scene, this._camera);
+
+    this._resize();
+    this._update(this._clock.getDelta());
+    this._render(this._clock.getDelta());
+  }
+
+  _resize() {
+    var width = this._container.offsetWidth;
+    var height = this._container.offsetHeight;
+    this._camera.aspect = width / height;
+    this._camera.updateProjectionMatrix();
+    this._renderer.setSize(width, height);
+    this._effect.setSize(width, height);
+  }
+
+  _update(dt) {
+    this._camera.updateProjectionMatrix();
+    this._controls.update(dt);
+  }
+
+  _render(dt) {
+    this._effect.render(this._scene, this._camera);
+  }
+
+  _fullscreen() {
+    var docElm = document.documentElement;
+    if (docElm.requestFullscreen) {
+      docElm.requestFullscreen();
+    } else if (docElm.msRequestFullscreen) {
+      docElm.msRequestFullscreen();
+    } else if (docElm.mozRequestFullScreen) {
+      docElm.mozRequestFullScreen();
+    } else if (docElm.webkitRequestFullscreen) {
+      docElm.webkitRequestFullscreen();
+    }
   }
 
   _onWheel(e) {
@@ -171,6 +206,8 @@ class ThetaView {
     this._renderer = null;
     this._container = undefined;
     this._timer = undefined;
+    this._effect = undefined;
+    this._clock = undefined;
     const ua = window.navigator.userAgent.toLowerCase();
     this._isChrome = (ua.indexOf('chrome') !== -1);
   }
@@ -182,12 +219,29 @@ class ThetaView {
     const h = this._container.clientHeight;
 
     // create Camera
-    this._camera = new THREE.PerspectiveCamera(75, w / h, 1, 1100);
+    // this._camera = new THREE.PerspectiveCamera(75, w / h, 1, 1100);
+    this._camera = new THREE.PerspectiveCamera(90, w / h, 0.1, 10000);
     this._camera.target = new THREE.Vector3(0, 0, 0);
+    // this._camera.position.y = 0;
+    // this._camera.position.z = 500;
 
     // create Scene
     this._scene = new THREE.Scene();
-    this._scene.add(new THREE.Mesh(this._createGeometry(), this._createMaterial(videoDOM)));
+    // this._scene.add(new THREE.Mesh(this._createGeometry(), this._createMaterial(videoDOM)));
+
+    var videoTexture = new THREE.VideoTexture(videoDOM);
+    videoTexture.minFilter = THREE.LinearFilter;
+    videoTexture.magFilter = THREE.LinearFilter;
+    videoTexture.format = THREE.RGBFormat;
+
+    var cubeGeometry = new THREE.SphereGeometry(500, 60, 40);
+    var sphereMat = new THREE.MeshBasicMaterial({map: videoTexture});
+    sphereMat.side = THREE.FrontSide;
+    var cube = new THREE.Mesh(cubeGeometry, sphereMat);
+    cube.scale.x = -1;
+    cube.rotation.y = Math.PI / 2;
+
+    this._scene.add(cube);
 
     // create Renderer
     this._renderer = new THREE.WebGLRenderer();
@@ -203,9 +257,42 @@ class ThetaView {
     this._renderer.domElement.addEventListener('touchmove', this._onTouchMove.bind(this), false);
     this._renderer.domElement.className += ' 360video';
 
-    this._container.appendChild(this._renderer.domElement);
+    this._element = this._renderer.domElement;
+
+    this._container.appendChild(this._element);
     const dom = videoDOM;
     dom.style.display = 'none';
+
+    // VR stuff.
+
+    this._effect = new THREE.StereoEffect(this._renderer);
+    
+    // this._controls = new THREE.OrbitControls(this._camera, this._element);
+    // this._controls.target.set(
+    //   this._camera.position.x + 0.15,
+    //   this._camera.position.y,
+    //   this._camera.position.z
+    // );
+    // this._controls.noPan = true;
+    // this._controls.noZoom = true;
+    
+    // TEST FOR DESKTOP
+    // this._controls = new THREE.OrbitControls(this._camera);
+    // this._controls.enableDamping = true;
+    // this._controls.dampingFactor = 0.25;
+    // this._controls.enableZoom = false; 
+    // this._controls.maxDistance = 500;
+    // this._controls.minDistance = 500;
+
+    // Our preferred controls via DeviceOrientation
+    this._controls = new THREE.DeviceOrientationControls(this._camera, true);
+    this._controls.connect();
+    this._controls.update();
+    this._element.addEventListener('click', this._fullscreen, false);
+    //window.addEventListener('click', this._fullscreen, false);
+
+    this._clock = new THREE.Clock();
+
     this._animate();
   }
 

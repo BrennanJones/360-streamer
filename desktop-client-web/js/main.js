@@ -90,6 +90,7 @@ jQuery(function()
   // PeerJS object
   var peer = new Peer(
     { host: window.location.hostname, port: 8055, path: '/peer', secure: true, debug: 3 },
+    //{ key: 's51s84ud22jwz5mi' },
     { config: {'iceServers': [
       {
         url: 'turn:numb.viagenie.ca',
