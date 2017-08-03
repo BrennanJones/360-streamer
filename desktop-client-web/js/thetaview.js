@@ -149,7 +149,7 @@ class ThetaView
     
     if (this._isMobile)
     {
-      // DEFAULT (PREFERRED)
+      // Default controls (for mobile device in VR headset)
       this._controls = new THREE.DeviceOrientationControls(this._camera, true);
       this._controls.connect();
       this._controls.update();
@@ -157,7 +157,7 @@ class ThetaView
     }
     else
     {
-      // FALLBACK
+      // Fallback controls (for desktop machine)
       this._controls = new THREE.OrbitControls(this._camera, this._element);
       this._controls.target.set(
         this._camera.position.x + 0.15,

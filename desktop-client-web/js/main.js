@@ -19,6 +19,13 @@ jQuery(function()
 
   const thetaview = new ThetaView();
 
+  var mediaSource;
+  var mediaRecorder;
+  var recordedBlobs;
+  var sourceBuffer;
+  var videoRecordCanvasStream;
+  var recordingStarted = false;
+
 
   /**
    * SOCKET MESSAGE HANDLERS
@@ -146,7 +153,12 @@ jQuery(function()
 
   function step2()
   {
-    // Nothing happens here, but code could go here later.
+    if (recordingStarted)
+    {
+      stopRecording();
+      recordingStarted = false;
+      download();
+    }
   }
 
   function step3(call)
@@ -157,22 +169,141 @@ jQuery(function()
       window.existingCall.close();
     }
 
-    // Wait for stream on the call, then set peer video display
-    call.on('stream', function(stream)
+    if (window.clientType == 'Broadcaster')
     {
-      console.log('stream');
+      $('#localVideo').prop('src', URL.createObjectURL(window.localStream));
 
-      if (window.clientType == 'Viewer')
+      // $('#videoRecordCanvas').width  = $('#localVideo').videoWidth;
+      // $('#videoRecordCanvas').height = $('#localVideo').videoHeight;
+
+      // videoRecordCanvasStream = $('#videoRecordCanvas').captureStream(); // frames per second
+      videoRecordCanvasStream = document.querySelector('canvas').captureStream(); // frames per second
+
+      mediaSource = new MediaSource();
+      mediaSource.addEventListener('sourceopen', handleSourceOpen, false);
+
+      startRecording();
+      recordingStarted = true;
+
+      setTimeout(recordPoll, 2000);
+    }
+    else // if (window.clientType == 'Viewer')
+    {
+      // Wait for stream on the call, then set peer video display
+      call.on('stream', function(stream)
       {
-        $('#theirVideo').prop('src', URL.createObjectURL(stream));
+        console.log('stream');
+
+        $('#remoteVideo').prop('src', URL.createObjectURL(stream));
 
         console.log('start360');
         start360();
-      }
-    });
+      });
+    }
 
     window.existingCall = call;
     call.on('close', step2);
+  }
+
+
+  /**
+   * RECORDING
+   */
+
+  function handleSourceOpen(event)
+  {
+    console.log('MediaSource opened');
+    sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vp8"');
+    console.log('Source buffer: ', sourceBuffer);
+  }
+
+  function handleDataAvailable(event)
+  {
+    if (event.data && event.data.size > 0)
+    {
+      recordedBlobs.push(event.data);
+    }
+  }
+
+  function handleStop(event)
+  {
+    console.log('Recorder stopped: ', event);
+  }
+
+  function startRecording()
+  {
+    var options = {mimeType: 'video/webm'};
+    recordedBlobs = [];
+
+    // The nested try blocks will be simplified when Chrome 47 moves to Stable
+    try
+    {
+      mediaRecorder = new MediaRecorder(videoRecordCanvasStream, options);
+    }
+    catch (e0)
+    {
+      console.log('Unable to create MediaRecorder with options Object: ', e0);
+      try
+      {
+        options = {mimeType: 'video/webm,codecs=vp9'};
+        mediaRecorder = new MediaRecorder(videoRecordCanvasStream, options);
+      }
+      catch (e1)
+      {
+        console.log('Unable to create MediaRecorder with options Object: ', e1);
+        try
+        {
+          options = 'video/vp8'; // Chrome 47
+          mediaRecorder = new MediaRecorder(videoRecordCanvasStream, options);
+        }
+        catch (e2)
+        {
+          alert('MediaRecorder is not supported by this browser.\n\n' +
+              'Try Firefox 29 or later, or Chrome 47 or later, with Enable experimental Web Platform features enabled from chrome://flags.');
+          console.error('Exception while creating MediaRecorder:', e2);
+          return;
+        }
+      }
+    }
+
+    console.log('Created MediaRecorder', mediaRecorder, 'with options', options);
+    mediaRecorder.onstop = handleStop;
+    mediaRecorder.ondataavailable = handleDataAvailable;
+    mediaRecorder.start(100); // collect 100ms of data
+    console.log('MediaRecorder started', mediaRecorder);
+  }
+
+  function stopRecording()
+  {
+    mediaRecorder.stop();
+    console.log('Recorded Blobs: ', recordedBlobs);
+  }
+
+  function download()
+  {
+    var blob = new Blob(recordedBlobs, {type: 'video/webm'});
+    var url = window.URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = 'test.webm';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 100);
+  }
+
+  function recordPoll()
+  {
+    // var videoRecordCanvas = $('#videoRecordCanvas');
+    var videoRecordCanvas = document.querySelector('canvas');
+
+    var ctx = videoRecordCanvas.getContext('2d');
+    ctx.drawImage(document.getElementById('localVideo'), 0, 0, videoRecordCanvas.width, videoRecordCanvas.height);
+
+    setTimeout(recordPoll, 33);
   }
 
 
@@ -183,11 +314,11 @@ jQuery(function()
   function start360()
   {
   	thetaview.setContainer($('#videoContainer')[0]);
-  	thetaview.start($('#theirVideo')[0]);
+  	thetaview.start($('#remoteVideo')[0]);
   }
 
   function stop360()
   {
-  	thetaview.stop($('#theirVideo')[0]);
+  	thetaview.stop($('#remoteVideo')[0]);
   }
 });

@@ -6,6 +6,16 @@
 	overflow: hidden;
 }
 
+/*.container
+{
+	position: fixed;
+    top: 0;
+    left: 0;
+    width:100%;
+    height:100%;
+	background-color: #000;
+}*/
+
 .videoContainer
 {
 	position: absolute;
@@ -16,24 +26,14 @@
 	background-color: #000;
 }
 
-.container
-{
-	position: fixed;
-    top: 0;
-    left: 0;
-    width:100%;
-    height:100%;
-	background-color: #000;
-}
-
-.theirVideo
+.video
 {
 	width: 100%;
 	height: 100%;
 	background-color: #000;
 }
 
-.myVideo
+/*.localVideo
 {
 	display: none;
 	position: absolute;
@@ -42,7 +42,7 @@
 	width: 20%;
 	height: auto;
 	background-color: #000;
-}
+}*/
 
 .360Video
 {
@@ -50,4 +50,11 @@
 	height: 100%;
 	background-color: #000;
 	z-index: 100;
+}
+
+.videoRecordCanvas
+{
+	display: none;
+	width: 1280px;
+	height: 720px;
 }
