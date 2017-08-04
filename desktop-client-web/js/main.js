@@ -23,7 +23,7 @@ jQuery(function()
   var mediaRecorder;
   var recordedBlobs;
   var sourceBuffer;
-  var videoRecordCanvasStream;
+  //var videoRecordCanvasStream;
   var recordingStarted = false;
 
 
@@ -171,13 +171,13 @@ jQuery(function()
 
     if (window.clientType == 'Broadcaster')
     {
-      $('#localVideo').prop('src', URL.createObjectURL(window.localStream));
+      //$('#localVideo').prop('src', URL.createObjectURL(window.localStream));
 
       // $('#videoRecordCanvas').width  = $('#localVideo').videoWidth;
       // $('#videoRecordCanvas').height = $('#localVideo').videoHeight;
 
       // videoRecordCanvasStream = $('#videoRecordCanvas').captureStream(); // frames per second
-      videoRecordCanvasStream = document.querySelector('canvas').captureStream(); // frames per second
+      // videoRecordCanvasStream = document.querySelector('canvas').captureStream(); // frames per second
 
       mediaSource = new MediaSource();
       mediaSource.addEventListener('sourceopen', handleSourceOpen, false);
@@ -185,7 +185,7 @@ jQuery(function()
       startRecording();
       recordingStarted = true;
 
-      setTimeout(recordPoll, 2000);
+      // setTimeout(recordPoll, 2000);
     }
     else // if (window.clientType == 'Viewer')
     {
@@ -238,7 +238,8 @@ jQuery(function()
     // The nested try blocks will be simplified when Chrome 47 moves to Stable
     try
     {
-      mediaRecorder = new MediaRecorder(videoRecordCanvasStream, options);
+      // mediaRecorder = new MediaRecorder(videoRecordCanvasStream, options);
+      mediaRecorder = new MediaRecorder(window.localStream, options);
     }
     catch (e0)
     {
@@ -246,7 +247,8 @@ jQuery(function()
       try
       {
         options = {mimeType: 'video/webm,codecs=vp9'};
-        mediaRecorder = new MediaRecorder(videoRecordCanvasStream, options);
+        // mediaRecorder = new MediaRecorder(videoRecordCanvasStream, options);
+        mediaRecorder = new MediaRecorder(window.localStream, options);
       }
       catch (e1)
       {
@@ -254,7 +256,8 @@ jQuery(function()
         try
         {
           options = 'video/vp8'; // Chrome 47
-          mediaRecorder = new MediaRecorder(videoRecordCanvasStream, options);
+          // mediaRecorder = new MediaRecorder(videoRecordCanvasStream, options);
+          mediaRecorder = new MediaRecorder(window.localStream, options);
         }
         catch (e2)
         {
@@ -295,16 +298,16 @@ jQuery(function()
     }, 100);
   }
 
-  function recordPoll()
-  {
-    // var videoRecordCanvas = $('#videoRecordCanvas');
-    var videoRecordCanvas = document.querySelector('canvas');
+  // function recordPoll()
+  // {
+  //   // var videoRecordCanvas = $('#videoRecordCanvas');
+  //   var videoRecordCanvas = document.querySelector('canvas');
 
-    var ctx = videoRecordCanvas.getContext('2d');
-    ctx.drawImage(document.getElementById('localVideo'), 0, 0, videoRecordCanvas.width, videoRecordCanvas.height);
+  //   var ctx = videoRecordCanvas.getContext('2d');
+  //   ctx.drawImage(document.getElementById('localVideo'), 0, 0, videoRecordCanvas.width, videoRecordCanvas.height);
 
-    setTimeout(recordPoll, 33);
-  }
+  //   setTimeout(recordPoll, 33);
+  // }
 
 
   /**
