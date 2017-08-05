@@ -41,7 +41,10 @@ function handler(request, response)
 
 app.listen(8082);
 
+var serverStartedDate = Date.now();
 console.log('Server started. [' + (new Date()).toString() + ']');
+
+filesystem.mkdirSync('./data/' + serverStartedDate);
 
 
 /* CLIENT SOCKET SESSION IDs */
@@ -51,6 +54,9 @@ var viewerClientSocketSessionID = null;
 /* PEER */
 var broadcasterClientPeerID;
 var viewerClientPeerID;
+
+/* LOG FILE */
+var logFileWriteStream = filesystem.createWriteStream('data/' + serverStartedDate + '/log.csv');
 
 
 io.sockets.on('connection', function(socket)
@@ -150,4 +156,18 @@ io.sockets.on('connection', function(socket)
 			io.sockets.emit('CallCommand', viewerClientPeerID);
 		}
 	}
+
+
+	/* LOGGING */
+
+	socket.on('LogCameraInfo', function(cameraInfo)
+	{
+		logFileWriteStream.write(
+			Date.now() + ',' +
+			cameraInfo.worldDirection.x + ',' +
+			cameraInfo.worldDirection.y + ',' +
+			cameraInfo.worldDirection.z + ',' +
+			cameraInfo.fov + ',' +
+			cameraInfo.aspect + '\n' );
+	});
 });

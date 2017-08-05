@@ -211,6 +211,16 @@ class ThetaView
       this._renderer.setSize(w, w / this._camera.aspect);
     };
   }
+
+  getCameraInfo()
+  {
+    var cameraInfo = {
+      worldDirection: this._camera.getWorldDirection(),
+      fov: this._camera.fov,
+      aspect: this._camera.aspect
+    };
+    return cameraInfo;
+  }
 }
 
 //exports.ThetaView = ThetaView;

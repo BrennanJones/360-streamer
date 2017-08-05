@@ -198,6 +198,8 @@ jQuery(function()
 
         console.log('start360');
         start360();
+
+        logCameraInfo();
       });
     }
 
@@ -323,5 +325,16 @@ jQuery(function()
   function stop360()
   {
   	thetaview.stop($('#remoteVideo')[0]);
+  }
+
+
+  /**
+   * LOGGING
+   */
+
+  function logCameraInfo()
+  {
+    socket.emit('LogCameraInfo', thetaview.getCameraInfo());
+    setTimeout(logCameraInfo, 50);
   }
 });
