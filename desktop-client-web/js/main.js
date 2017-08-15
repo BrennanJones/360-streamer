@@ -139,7 +139,11 @@ jQuery(function()
     else if (window.clientType == 'Broadcaster')
     {
       // Get audio/video stream
-      navigator.getUserMedia({audio: true, video: true}, function(stream)
+      navigator.getUserMedia({
+        audio: true,
+        video: true
+      },
+      function(stream)
       {
         window.localStream = stream;
         socket.emit('BroadcasterClientPeerID', peer.id);

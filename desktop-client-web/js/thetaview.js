@@ -108,7 +108,7 @@ class ThetaView
 
     // Create the camera
 
-    this._camera = new THREE.PerspectiveCamera(90, w / h, 0.1, 10000);
+    this._camera = new THREE.PerspectiveCamera(110, w / h, 0.1, 10000);
     this._camera.target = new THREE.Vector3(0, 0, 0);
 
     // Create the scene
