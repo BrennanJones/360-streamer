@@ -1,0 +1,129 @@
+<html>
+
+<head>
+
+  <title>360 Video Stream Investigator</title>
+  
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="../lib/js/jquery.min.js"></script>
+  
+  <script id="script-main" type="text/javascript">
+
+    var url = "https://" + window.location.hostname + ":8082";
+    var socket = io.connect(url);
+
+
+    /* SOCKET MESSAGE HANDLERS */
+
+    // Connection
+
+    socket.on('connect', function()
+    {
+      console.log('socket.io connected');
+
+      socket.emit('InvestigatorClientConnect', null);
+    });
+
+    socket.on('disconnect', function()
+    {
+      console.log('socket.io disconnected');
+
+      alert("Connection with server failed.")
+    });
+
+    // Server updates
+
+    socket.on('ClientConnect', function(clientType)
+    {
+      console.log('ClientConnect: ' + clientType);
+
+      if (clientType == 'Broadcaster')
+      {
+        document.getElementById('broadcasterStatusStr').innerHTML = '<b>Broadcaster:</b> Online';
+      }
+      else if (clientType == 'Viewer')
+      {
+        document.getElementById('viewerStatusStr').innerHTML = '<b>Viewer:</b> Online';
+      }
+    });
+
+    socket.on('ClientDisconnect', function(clientType)
+    {
+      console.log('ClientDisconnect: ' + clientType);
+
+      if (clientType == 'Broadcaster')
+      {
+        document.getElementById('broadcasterStatusStr').innerHTML = '<b>Broadcaster:</b> Offline';
+      }
+      else if (clientType == 'Viewer')
+      {
+        document.getElementById('viewerStatusStr').innerHTML = '<b>Viewer:</b> Offline';
+      }
+    });
+
+    socket.on('CallOnline', function()
+    {
+      console.log('CallOnline');
+
+      document.getElementById('callStatusStr').innerHTML = '<b>Status:</b> Online';
+    });
+
+    socket.on('CallOffline', function()
+    {
+      console.log('CallOffline');
+
+      document.getElementById('callStatusStr').innerHTML = '<b>Status:</b> Offline';
+    });
+
+    socket.on('UpdatedPairID', function(pairID)
+    {
+      console.log('UpdatedPairID: ' + pairID);
+
+      document.getElementById('pairIDStr').innerHTML = '<b>Pair ID:</b> ' + pairID;
+    });
+
+    // Controls
+
+    function startCall()
+    {
+      socket.emit('I_StartCall');
+    }
+
+    function endCall()
+    {
+      socket.emit('I_EndCall');
+    }
+
+    function updatePairID()
+    {
+      socket.emit('I_UpdatePairID', document.getElementById('pairIDTextField').value);
+    }
+
+  </script>
+
+</head>
+
+<body>
+
+  <h2>Investigator Statuses and Controls</h2>
+
+  <div>
+    <p><b>Enter Pair ID:</b> <input id="pairIDTextField" type="text" name="pairIDTextField" value=""><input id="submitPairIDButton" type="button" value="Submit pair ID" onclick="updatePairID();"></p>
+    <p id="pairIDStr"><b>Pair ID:</b> --</p>
+  </div>
+
+  <div>
+    <h3>Client Statuses</h3>
+    <p id="broadcasterStatusStr"><b>Broadcaster:</b> --</p>
+    <p id="viewerStatusStr"><b>Viewer:</b> --</p>
+  </div>
+
+  <div>
+    <h3>Call</h3>
+    <p id="callStatusStr"><b>Status:</b> --</p>
+    <p><input id="restartCallButton" type="button" value="Start/restart call" onclick="startCall();"> <input id="endCallButton" type="button" value="End call" onclick="endCall();"></p>
+  </div>
+
+</body>
+
+</html>

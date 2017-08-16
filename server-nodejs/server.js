@@ -50,13 +50,18 @@ filesystem.mkdirSync('./data/' + serverStartedDate);
 /* CLIENT SOCKET SESSION IDs */
 var broadcasterClientSocketSessionID = null;
 var viewerClientSocketSessionID = null;
+var investigatorClientSocketSessionID = null;
 
 /* PEER */
 var broadcasterClientPeerID;
 var viewerClientPeerID;
+var callIsOnline = false;
 
 /* LOG FILE */
 var logFileWriteStream = filesystem.createWriteStream('data/' + serverStartedDate + '/log.csv');
+
+/* LOGGED INFORMATION */
+var pairID;
 
 
 io.sockets.on('connection', function(socket)
@@ -69,21 +74,55 @@ io.sockets.on('connection', function(socket)
 
 	socket.on('disconnect', function()
 	{
-		console.log(((clientType == 'Viewer' || clientType == 'Broadcaster') ? clientType : 'A') +
+		console.log(((clientType == 'Broadcaster' || clientType == 'Viewer' || clientType == 'Investigator') ? clientType : 'A') +
 			' client (' + clientAddress + ') disconnected [' + (new Date()).toString() + ']');
 		io.sockets.emit('ClientDisconnect', clientType);
 
-		if (clientType == 'Viewer')
-		{
-			viewerClientSocketSessionID = null;
-			viewerClientPeerID = null;
-		}
-		else if (clientType == 'Broadcaster')
+		if (clientType == 'Broadcaster')
 		{
 			broadcasterClientSocketSessionID = null;
 			broadcasterClientPeerID = null;
 		}
+		else if (clientType == 'Viewer')
+		{
+			viewerClientSocketSessionID = null;
+			viewerClientPeerID = null;
+		}
+		else if (clientType == 'Investigator')
+		{
+			investigatorClientSocketSessionID = null;
+		}
 	});
+
+
+	if (broadcasterClientSocketSessionID != null)
+	{
+		socket.emit('ClientConnect', 'Broadcaster');
+	}
+	else
+	{
+		socket.emit('ClientDisconnect', 'Broadcaster');
+	}
+
+	if (viewerClientSocketSessionID != null)
+	{
+		socket.emit('ClientConnect', 'Viewer');
+	}
+	else
+	{
+		socket.emit('ClientDisconnect', 'Viewer');
+	}
+
+	if (callIsOnline)
+	{
+		socket.emit('CallOnline');
+	}
+	else
+	{
+		socket.emit('CallOffline')
+	}
+
+	socket.emit('UpdatedPairID', pairID);
 
 
 	/**
@@ -99,22 +138,7 @@ io.sockets.on('connection', function(socket)
 
 
 	/* CONNECTION */
-	
-	socket.on('ViewerClientConnect', function(data)
-	{
-		if (viewerClientSocketSessionID == null)
-		{
-			viewerClientSocketSessionID = socket.id;
-			console.log('Viewer client connected (' + clientAddress + ') [' + (new Date()).toString() + ']');
-			clientType = 'Viewer';
-		}
-		else
-		{
-			socket.disconnect('unauthorized');
-			console.log('Unauthorized viewer client (' + clientAddress + ') tried to connect [' + (new Date()).toString() + ']');
-		}
-	});
-	
+
 	socket.on('BroadcasterClientConnect', function(data)
 	{
 		if (broadcasterClientSocketSessionID == null)
@@ -122,11 +146,45 @@ io.sockets.on('connection', function(socket)
 			broadcasterClientSocketSessionID = socket.id;
 			console.log('Broadcaster client connected (' + clientAddress + ') [' + (new Date()).toString() + ']');
 			clientType = 'Broadcaster';
+
+			io.sockets.emit('ClientConnect', 'Broadcaster');
 		}
 		else
 		{
 			socket.disconnect('unauthorized');
 			console.log('Unauthorized broadcaster client (' + clientAddress + ') tried to connect [' + (new Date()).toString() + ']');
+		}
+	});
+
+	socket.on('ViewerClientConnect', function(data)
+	{
+		if (viewerClientSocketSessionID == null)
+		{
+			viewerClientSocketSessionID = socket.id;
+			console.log('Viewer client connected (' + clientAddress + ') [' + (new Date()).toString() + ']');
+			clientType = 'Viewer';
+			
+			io.sockets.emit('ClientConnect', 'Viewer');
+		}
+		else
+		{
+			socket.disconnect('unauthorized');
+			console.log('Unauthorized viewer client (' + clientAddress + ') tried to connect [' + (new Date()).toString() + ']');
+		}
+	});
+
+	socket.on('InvestigatorClientConnect', function(data)
+	{
+		if (investigatorClientSocketSessionID == null)
+		{
+			investigatorClientSocketSessionID = socket.id;
+			console.log('Investigator client connected (' + clientAddress + ') [' + (new Date()).toString() + ']');
+			clientType = 'Investigator';
+		}
+		else
+		{
+			socket.disconnect('unauthorized');
+			console.log('Unauthorized investigator client (' + clientAddress + ') tried to connect [' + (new Date()).toString() + ']');
 		}
 	});
 	
@@ -138,7 +196,7 @@ io.sockets.on('connection', function(socket)
 		console.log('BroadcasterClientPeerID: ' + data + ' [' + (new Date()).toString() + ']');
 
 		broadcasterClientPeerID = data;
-		trySendCallCommand();
+		//trySendCallCommand();
 	});
 	
 	socket.on('ViewerClientPeerID', function(data)
@@ -146,16 +204,54 @@ io.sockets.on('connection', function(socket)
 		console.log('ViewerClientPeerID: ' + data + ' [' + (new Date()).toString() + ']');
 
 		viewerClientPeerID = data;
+		//trySendCallCommand();
+	});
+
+	socket.on('CallOnline', function(data)
+	{
+		console.log('CallOnline [' + (new Date()).toString() + ']');
+		callIsOnline = true;
+		io.sockets.emit('CallOnline');
+	});
+
+	socket.on('CallOffline', function(data)
+	{
+		console.log('CallOffline [' + (new Date()).toString() + ']');
+		callIsOnline = false;
+		io.sockets.emit('CallOffline');
+	});
+
+
+	/* INVESTIGATOR CONTROLS */
+
+	socket.on('I_StartCall', function(data)
+	{
+		console.log('I_StartCall [' + (new Date()).toString() + ']');
+		
+		if (callIsOnline)
+		{
+			io.sockets.emit('EndCall');
+		}
+		
 		trySendCallCommand();
 	});
 
-	function trySendCallCommand()
+	socket.on('I_EndCall', function(data)
 	{
-		if (viewerClientPeerID && broadcasterClientPeerID)
+		console.log('I_EndCall [' + (new Date()).toString() + ']');
+		
+		if (callIsOnline)
 		{
-			io.sockets.emit('CallCommand', viewerClientPeerID);
+			io.sockets.emit('EndCall');
 		}
-	}
+	});
+
+	socket.on('I_UpdatePairID', function(data)
+	{
+		console.log('I_UpdatePairID: ' + data + ' [' + (new Date()).toString() + ']');
+		pairID = data;
+		io.sockets.emit('UpdatedPairID', pairID);
+	});
 
 
 	/* LOGGING */
@@ -163,6 +259,7 @@ io.sockets.on('connection', function(socket)
 	socket.on('LogCameraInfo', function(cameraInfo)
 	{
 		logFileWriteStream.write(
+			pairID + ',' +
 			Date.now() + ',' +
 			cameraInfo.worldDirection.x + ',' +
 			cameraInfo.worldDirection.y + ',' +
@@ -170,4 +267,16 @@ io.sockets.on('connection', function(socket)
 			cameraInfo.fov + ',' +
 			cameraInfo.aspect + '\n' );
 	});
+
+
+	function trySendCallCommand()
+	{
+		if (viewerClientPeerID && broadcasterClientPeerID)
+		{
+			io.sockets.emit('StartCall', {
+				viewerClientPeerID: viewerClientPeerID,
+				currentServerTime: Date.now()
+			});
+		}
+	}
 });

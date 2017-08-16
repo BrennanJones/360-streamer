@@ -24,6 +24,7 @@ jQuery(function()
   var recordedBlobs;
   var sourceBuffer;
   //var videoRecordCanvasStream;
+  var callStartTime;
   var recordingStarted = false;
 
 
@@ -56,14 +57,29 @@ jQuery(function()
 
   /* PEER */
 
-  socket.on('CallCommand', function(viewerClientPeerID)
+  socket.on('StartCall', function(data)
   {
     if (window.clientType == 'Broadcaster')
     {
-      console.log('CallCommand');
+      console.log('StartCall command received');
 
-      var call = peer.call(viewerClientPeerID, window.localStream);
+      callStartTime = data.currentServerTime;
+
+      var call = peer.call(data.viewerClientPeerID, window.localStream);
       step3(call);
+    }
+  });
+
+  socket.on('EndCall', function(viewerClientPeerID)
+  {
+    if (window.clientType == 'Broadcaster')
+    {
+      console.log('EndCall command received');
+
+      if (window.existingCall)
+      {
+        window.existingCall.close();
+      }
     }
   });
 
@@ -157,11 +173,16 @@ jQuery(function()
 
   function step2()
   {
-    if (recordingStarted)
+    if (window.clientType == 'Broadcaster')
     {
-      stopRecording();
-      recordingStarted = false;
-      download();
+      socket.emit('CallOffline');
+      
+      if (recordingStarted)
+      {
+        stopRecording();
+        recordingStarted = false;
+        download();
+      }
     }
   }
 
@@ -182,6 +203,8 @@ jQuery(function()
 
       // videoRecordCanvasStream = $('#videoRecordCanvas').captureStream(); // frames per second
       // videoRecordCanvasStream = document.querySelector('canvas').captureStream(); // frames per second
+
+      socket.emit('CallOnline');
 
       mediaSource = new MediaSource();
       mediaSource.addEventListener('sourceopen', handleSourceOpen, false);
@@ -295,7 +318,7 @@ jQuery(function()
     var a = document.createElement('a');
     a.style.display = 'none';
     a.href = url;
-    a.download = 'test.webm';
+    a.download = callStartTime + '.webm';
     document.body.appendChild(a);
     a.click();
     setTimeout(function() {
