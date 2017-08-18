@@ -12,6 +12,8 @@
     var url = "https://" + window.location.hostname + ":8082";
     var socket = io.connect(url);
 
+    var inTaskStage = false;
+
 
     /* SOCKET MESSAGE HANDLERS */
 
@@ -82,21 +84,59 @@
       document.getElementById('pairIDStr').innerHTML = '<b>Pair ID:</b> ' + pairID;
     });
 
+    socket.on('TaskStageBegin', function(taskStage)
+    {
+      console.log('TaskStageBegin: ' + taskStage);
+
+      inTaskStage = true;
+
+      document.getElementById('taskStageStatusStr').innerHTML = '<b>Current Geocache:</b> ' + taskStage;
+
+      document.getElementById('taskStageBeginButtonsDiv').style.display = 'none';
+      document.getElementById('taskStageInProgressDiv').style.display = 'inline';
+    });
+
+    socket.on('TaskStageEnd', function()
+    {
+      console.log('TaskStageEnd');
+
+      inTaskStage = false;
+
+      document.getElementById('taskStageBeginButtonsDiv').style.display = 'inline';
+      document.getElementById('taskStageInProgressDiv').style.display = 'none';
+    });
+
     // Controls
 
     function startCall()
     {
-      socket.emit('I_StartCall');
+      if (!inTaskStage || confirm('Geocache currently in progress. End call now?'))
+      {
+        socket.emit('I_StartCall');
+      }
     }
 
     function endCall()
     {
-      socket.emit('I_EndCall');
+      if (!inTaskStage || confirm('Geocache currently in progress. End call now?'))
+      {
+        socket.emit('I_EndCall');
+      }
     }
 
     function updatePairID()
     {
       socket.emit('I_UpdatePairID', document.getElementById('pairIDTextField').value);
+    }
+
+    function taskStageBegin(value)
+    {
+      socket.emit('I_TaskStageBegin', value);
+    }
+
+    function taskStageEnd()
+    {
+      socket.emit('I_TaskStageEnd');
     }
 
   </script>
@@ -122,6 +162,20 @@
     <h3>Call</h3>
     <p id="callStatusStr"><b>Status:</b> --</p>
     <p><input id="restartCallButton" type="button" value="Start/restart call" onclick="startCall();"> <input id="endCallButton" type="button" value="End call" onclick="endCall();"></p>
+  </div>
+
+  <div>
+    <h3>Task Stage</h3>
+    <div id="taskStageBeginButtonsDiv">
+      <p><input id="geocache1BeginButton" type="button" value="Begin Geocache 1" onclick="taskStageBegin('Geocache1');"></p>
+      <p><input id="geocache2BeginButton" type="button" value="Begin Geocache 2" onclick="taskStageBegin('Geocache2');"></p>
+      <p><input id="geocache3BeginButton" type="button" value="Begin Geocache 3" onclick="taskStageBegin('Geocache3');"></p>
+      <p><input id="geocache4BeginButton" type="button" value="Begin Geocache 4" onclick="taskStageBegin('Geocache4');"></p>
+    </div>
+    <div id="taskStageInProgressDiv" style="display:none;">
+      <p id="taskStageStatusStr"><b>Current Geocache:</b> --</p>
+      <p><input id="taskStageEndButton" type="button" value="End Geocache" onclick="taskStageEnd();"></p>
+    </div>
   </div>
 
 </body>

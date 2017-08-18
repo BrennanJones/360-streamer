@@ -26,6 +26,7 @@ jQuery(function()
   //var videoRecordCanvasStream;
   var callStartTime;
   var recordingStarted = false;
+  var is360Started = false;
 
 
   /**
@@ -184,6 +185,10 @@ jQuery(function()
         download();
       }
     }
+    else // if (window.clientType == 'Viewer')
+    {
+      is360Started = false;
+    }
   }
 
   function step3(call)
@@ -225,6 +230,7 @@ jQuery(function()
 
         console.log('start360');
         start360();
+        is360Started = true;
 
         logCameraInfo();
       });
@@ -361,7 +367,10 @@ jQuery(function()
 
   function logCameraInfo()
   {
-    socket.emit('LogCameraInfo', thetaview.getCameraInfo());
-    setTimeout(logCameraInfo, 50);
+    if (is360Started)
+    {
+      socket.emit('LogCameraInfo', thetaview.getCameraInfo());
+      setTimeout(logCameraInfo, 50);
+    }
   }
 });

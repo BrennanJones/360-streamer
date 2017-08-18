@@ -62,6 +62,7 @@ var logFileWriteStream = filesystem.createWriteStream('data/' + serverStartedDat
 
 /* LOGGED INFORMATION */
 var pairID;
+var taskStage = 'NONE';
 
 
 io.sockets.on('connection', function(socket)
@@ -120,6 +121,11 @@ io.sockets.on('connection', function(socket)
 	else
 	{
 		socket.emit('CallOffline')
+	}
+
+	if (taskStage != 'NONE')
+	{
+		socket.emit('TaskStageBegin', taskStage);
 	}
 
 	socket.emit('UpdatedPairID', pairID);
@@ -210,15 +216,43 @@ io.sockets.on('connection', function(socket)
 	socket.on('CallOnline', function(data)
 	{
 		console.log('CallOnline [' + (new Date()).toString() + ']');
+		
 		callIsOnline = true;
 		io.sockets.emit('CallOnline');
+
+		logFileWriteStream.write(
+			pairID + ',' +
+			Date.now() + ',' +
+			new Date()).toString() + ',' +
+			'ModeSwitch' + ',' +
+			'360Mode' + ',' +
+			',' +
+			',' +
+			',' +
+			',' +
+			',' +
+			taskStage + '\n' );
 	});
 
 	socket.on('CallOffline', function(data)
 	{
 		console.log('CallOffline [' + (new Date()).toString() + ']');
+		
 		callIsOnline = false;
 		io.sockets.emit('CallOffline');
+
+		logFileWriteStream.write(
+			pairID + ',' +
+			Date.now() + ',' +
+			new Date()).toString() + ',' +
+			'ModeSwitch' + ',' +
+			'StandardMode' + ',' +
+			',' +
+			',' +
+			',' +
+			',' +
+			',' +
+			taskStage + '\n' );
 	});
 
 
@@ -253,6 +287,48 @@ io.sockets.on('connection', function(socket)
 		io.sockets.emit('UpdatedPairID', pairID);
 	});
 
+	socket.on('I_TaskStageBegin', function(data)
+	{
+		console.log('I_TaskStageBegin: ' + data + ' [' + (new Date()).toString() + ']');
+		
+		taskStage = data;
+		io.sockets.emit('TaskStageBegin', taskStage);
+
+		logFileWriteStream.write(
+			pairID + ',' +
+			Date.now() + ',' +
+			new Date()).toString() + ',' +
+			'TaskStageBegin' + ',' +
+			(callIsOnline ? '360Mode' : 'StandardMode') + ',' +
+			',' +
+			',' +
+			',' +
+			',' +
+			',' +
+			taskStage + '\n' );
+	});
+
+	socket.on('I_TaskStageEnd', function()
+	{
+		console.log('I_TaskStageEnd [' + (new Date()).toString() + ']');
+
+		logFileWriteStream.write(
+			pairID + ',' +
+			Date.now() + ',' +
+			new Date()).toString() + ',' +
+			'TaskStageEnd' + ',' +
+			(callIsOnline ? '360Mode' : 'StandardMode') + ',' +
+			',' +
+			',' +
+			',' +
+			',' +
+			',' +
+			taskStage + '\n' );
+
+		taskStage = 'NONE';
+		io.sockets.emit('TaskStageEnd');
+	});
+
 
 	/* LOGGING */
 
@@ -261,11 +337,15 @@ io.sockets.on('connection', function(socket)
 		logFileWriteStream.write(
 			pairID + ',' +
 			Date.now() + ',' +
+			new Date()).toString() + ',' +
+			'UpdatedCameraInfo' + ',' +
+			/* (callIsOnline ? '360Mode' : 'StandardMode') */ '360Mode' + ',' +
 			cameraInfo.worldDirection.x + ',' +
 			cameraInfo.worldDirection.y + ',' +
 			cameraInfo.worldDirection.z + ',' +
 			cameraInfo.fov + ',' +
-			cameraInfo.aspect + '\n' );
+			cameraInfo.aspect + ',' +
+			taskStage + '\n' );
 	});
 
 
