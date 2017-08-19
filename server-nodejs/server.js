@@ -223,7 +223,7 @@ io.sockets.on('connection', function(socket)
 		logFileWriteStream.write(
 			pairID + ',' +
 			Date.now() + ',' +
-			new Date()).toString() + ',' +
+			(new Date()).toString() + ',' +
 			'ModeSwitch' + ',' +
 			'360Mode' + ',' +
 			',' +
@@ -244,7 +244,7 @@ io.sockets.on('connection', function(socket)
 		logFileWriteStream.write(
 			pairID + ',' +
 			Date.now() + ',' +
-			new Date()).toString() + ',' +
+			(new Date()).toString() + ',' +
 			'ModeSwitch' + ',' +
 			'StandardMode' + ',' +
 			',' +
@@ -297,7 +297,7 @@ io.sockets.on('connection', function(socket)
 		logFileWriteStream.write(
 			pairID + ',' +
 			Date.now() + ',' +
-			new Date()).toString() + ',' +
+			(new Date()).toString() + ',' +
 			'TaskStageBegin' + ',' +
 			(callIsOnline ? '360Mode' : 'StandardMode') + ',' +
 			',' +
@@ -315,7 +315,7 @@ io.sockets.on('connection', function(socket)
 		logFileWriteStream.write(
 			pairID + ',' +
 			Date.now() + ',' +
-			new Date()).toString() + ',' +
+			(new Date()).toString() + ',' +
 			'TaskStageEnd' + ',' +
 			(callIsOnline ? '360Mode' : 'StandardMode') + ',' +
 			',' +
@@ -337,7 +337,7 @@ io.sockets.on('connection', function(socket)
 		logFileWriteStream.write(
 			pairID + ',' +
 			Date.now() + ',' +
-			new Date()).toString() + ',' +
+			(new Date()).toString() + ',' +
 			'UpdatedCameraInfo' + ',' +
 			/* (callIsOnline ? '360Mode' : 'StandardMode') */ '360Mode' + ',' +
 			cameraInfo.worldDirection.x + ',' +
