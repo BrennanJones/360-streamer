@@ -159,6 +159,7 @@ jQuery(function()
       navigator.getUserMedia({
         audio: true,
         video: true
+        //video: { width: 1920, height: 1080 }
       },
       function(stream)
       {

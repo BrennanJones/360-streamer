@@ -81,6 +81,29 @@ class ThetaView
     }
   }
 
+  _addShape(shape, color, x, y, z, rx, ry, rz, s)
+  {
+    var geometry = new THREE.ShapeBufferGeometry( shape );
+    var mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide, transparent: true, opacity: 0.6 } ) );
+    mesh.position.set( x, y, z );
+    mesh.rotation.set( rx, ry, rz );
+    mesh.scale.set( s, s, s );
+    this._scene.add( mesh );
+  }
+
+  _addLineShape(shape, color, x, y, z, rx, ry, rz, s)
+  {
+    shape.autoClose = true;
+    var points = shape.createPointsGeometry();
+    var spacedPoints = shape.createSpacedPointsGeometry( 50 );
+    
+    var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, linewidth: 10, transparent: true, opacity: 0.6 } ) );
+    line.position.set( x, y, z );
+    line.rotation.set( rx, ry, rz );
+    line.scale.set( s, s, s );
+    this._scene.add( line );
+  }
+
   constructor()
   {
     this._camera = null;
@@ -128,6 +151,21 @@ class ThetaView
     cube.rotation.y = Math.PI / 2;
 
     this._scene.add(cube);
+
+    // Forward reference arrow
+    
+    var arrowShape = new THREE.Shape();
+    arrowShape.moveTo( 0, 0 );
+    arrowShape.lineTo( 0, 60 );
+    arrowShape.lineTo( -20, 60 );
+    arrowShape.lineTo( 20, 100 );
+    arrowShape.lineTo( 60, 60 );
+    arrowShape.lineTo( 40, 60 );
+    arrowShape.lineTo( 40, 0 );
+    arrowShape.lineTo( 0, 0 );  // close path
+    
+    this._addShape(arrowShape, 0xffffff, -10, -50, 50, Math.PI/2, 0, 0, 1/2);     // fill
+    this._addLineShape(arrowShape, 0x000000, -10, -50, 50, Math.PI/2, 0, 0, 1/2)  // stroke
 
     // Create the renderer
 
