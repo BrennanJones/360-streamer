@@ -46,7 +46,7 @@ class ThetaView
 
     if (docElm.requestFullscreen)
     {
-      docElm.requestFullscreen();
+      docElm.requestFullscreen({navigationUI: "hide"});
     }
     else if (docElm.msRequestFullscreen)
     {
