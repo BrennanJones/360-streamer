@@ -93,15 +93,15 @@ class ThetaView
 
   _addLineShape(shape, color, x, y, z, rx, ry, rz, s)
   {
-    shape.autoClose = true;
-    var points = shape.createPointsGeometry();
-    var spacedPoints = shape.createSpacedPointsGeometry( 50 );
+    // shape.autoClose = true;
+    // var points = shape.createPointsGeometry();
+    // var spacedPoints = shape.createSpacedPointsGeometry( 50 );
     
-    var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, linewidth: 10, transparent: true, opacity: 0.6 } ) );
-    line.position.set( x, y, z );
-    line.rotation.set( rx, ry, rz );
-    line.scale.set( s, s, s );
-    this._scene.add( line );
+    // var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, linewidth: 10, transparent: true, opacity: 0.6 } ) );
+    // line.position.set( x, y, z );
+    // line.rotation.set( rx, ry, rz );
+    // line.scale.set( s, s, s );
+    // this._scene.add( line );
   }
 
   constructor()
@@ -139,13 +139,14 @@ class ThetaView
     this._scene = new THREE.Scene();
 
     var videoTexture = new THREE.VideoTexture(videoDOM);
-    videoTexture.minFilter = THREE.LinearFilter;
-    videoTexture.magFilter = THREE.LinearFilter;
+    videoTexture.minFilter = THREE.NearestFilter;
+    videoTexture.magFilter = THREE.NearestFilter;
     videoTexture.format = THREE.RGBFormat;
+	videoTexture.update();
 
     var cubeGeometry = new THREE.SphereGeometry(500, 60, 40);
     var sphereMat = new THREE.MeshBasicMaterial({map: videoTexture});
-    sphereMat.side = THREE.FrontSide;
+    sphereMat.side = THREE.BackSide;
     var cube = new THREE.Mesh(cubeGeometry, sphereMat);
     cube.scale.x = -1;
     cube.rotation.y = Math.PI / 2;
@@ -202,8 +203,8 @@ class ThetaView
         this._camera.position.y,
         this._camera.position.z
       );
-      this._controls.noPan = true;
-      this._controls.noZoom = true;
+      this._controls.enablePan = false;
+      this._controls.enableZoom = false;
     }
 
     this._clock = new THREE.Clock();

@@ -109,7 +109,7 @@ jQuery(function()
    */
 
   // Compatibility shim
-  navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+  //navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
   // PeerJS object
   var peer = new Peer(
@@ -156,20 +156,23 @@ jQuery(function()
     else if (window.clientType == 'Broadcaster')
     {
       // Get audio/video stream
-      navigator.getUserMedia({
-        audio: true,
-        video: true
-        //video: { width: 1920, height: 1080 }
-      },
-      function(stream)
-      {
-        window.localStream = stream;
-        socket.emit('BroadcasterClientPeerID', peer.id);
-      },
-      function()
-      {
-        console.log("step 1 error");
-      });
+	  navigator.mediaDevices.getUserMedia(
+	  {
+		audio: true,
+		//video: true
+		video: { width: 1920, height: 960 }
+	  }).then(function(stream)
+	  {
+		  // stream.getVideoTracks()[0].applyConstraints({
+			// width: 1920,
+			// height: 1080
+		  // });
+		  window.localStream = stream;
+		  socket.emit('BroadcasterClientPeerID', peer.id);
+	  }).catch(function(err)
+	  {
+		  console.log("step 1 error");
+	  });
     }
   }
 
@@ -202,7 +205,7 @@ jQuery(function()
 
     if (window.clientType == 'Broadcaster')
     {
-      //$('#localVideo').prop('src', URL.createObjectURL(window.localStream));
+      //$('#localVideo').prop('srcObject', window.localStream);
 
       // $('#videoRecordCanvas').width  = $('#localVideo').videoWidth;
       // $('#videoRecordCanvas').height = $('#localVideo').videoHeight;
@@ -227,13 +230,14 @@ jQuery(function()
       {
         console.log('stream');
 
-        $('#remoteVideo').prop('src', URL.createObjectURL(stream));
+        $('#remoteVideo').prop('srcObject', stream);
+		//$('#remoteVideo').srcObject = stream;
 
         console.log('start360');
         start360();
         is360Started = true;
 
-        logCameraInfo();
+        //logCameraInfo();
       });
     }
 
@@ -370,7 +374,7 @@ jQuery(function()
   {
     if (is360Started)
     {
-      socket.emit('LogCameraInfo', thetaview.getCameraInfo());
+      //socket.emit('LogCameraInfo', thetaview.getCameraInfo());
       setTimeout(logCameraInfo, 50);
     }
   }
