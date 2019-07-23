@@ -142,7 +142,7 @@ class ThetaView
     videoTexture.minFilter = THREE.NearestFilter;
     videoTexture.magFilter = THREE.NearestFilter;
     videoTexture.format = THREE.RGBFormat;
-	videoTexture.update();
+    videoTexture.update();
 
     var cubeGeometry = new THREE.SphereGeometry(500, 60, 40);
     var sphereMat = new THREE.MeshBasicMaterial({map: videoTexture});
@@ -209,19 +209,24 @@ class ThetaView
 
     this._clock = new THREE.Clock();
 
-    //this._animate();
-	
-	document.body.appendChild( WEBVR.createButton( this._renderer ) );
-	this._renderer.vr.enabled = true;
-	
-	var scene = this._scene;
-	var camera = this._camera;
-	var renderer = this._renderer;
-	this._renderer.setAnimationLoop( function () {
+    if (this._isMobile)
+    {
+      this._animate();
+    }
+    else
+    {
+      document.body.appendChild( WEBVR.createButton( this._renderer ) );
+      this._renderer.vr.enabled = true;
+      
+      var scene = this._scene;
+      var camera = this._camera;
+      var renderer = this._renderer;
+      this._renderer.setAnimationLoop( function () {
 
-		renderer.render( scene, camera );
+        renderer.render( scene, camera );
 
-	} );
+      } );
+    }
   }
 
   stop(videoDOM)
