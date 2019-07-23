@@ -149,24 +149,24 @@ class ThetaView
     sphereMat.side = THREE.BackSide;
     var cube = new THREE.Mesh(cubeGeometry, sphereMat);
     cube.scale.x = -1;
-    cube.rotation.y = Math.PI / 2;
+    cube.rotation.y = 0;
 
     this._scene.add(cube);
 
     // Forward reference arrow
     
-    var arrowShape = new THREE.Shape();
-    arrowShape.moveTo( 0, 0 );
-    arrowShape.lineTo( 0, 60 );
-    arrowShape.lineTo( -20, 60 );
-    arrowShape.lineTo( 20, 100 );
-    arrowShape.lineTo( 60, 60 );
-    arrowShape.lineTo( 40, 60 );
-    arrowShape.lineTo( 40, 0 );
-    arrowShape.lineTo( 0, 0 );  // close path
+    // var arrowShape = new THREE.Shape();
+    // arrowShape.moveTo( 0, 0 );
+    // arrowShape.lineTo( 0, 60 );
+    // arrowShape.lineTo( -20, 60 );
+    // arrowShape.lineTo( 20, 100 );
+    // arrowShape.lineTo( 60, 60 );
+    // arrowShape.lineTo( 40, 60 );
+    // arrowShape.lineTo( 40, 0 );
+    // arrowShape.lineTo( 0, 0 );  // close path
     
-    this._addShape(arrowShape, 0xffffff, -10, -50, 50, Math.PI/2, 0, 0, 1/2);     // fill
-    this._addLineShape(arrowShape, 0x000000, -10, -50, 50, Math.PI/2, 0, 0, 1/2)  // stroke
+    // this._addShape(arrowShape, 0xffffff, -10, -50, 50, Math.PI/2, 0, 0, 1/2);     // fill
+    // this._addLineShape(arrowShape, 0x000000, -10, -50, 50, Math.PI/2, 0, 0, 1/2)  // stroke
 
     // Create the renderer
 

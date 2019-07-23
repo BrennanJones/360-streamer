@@ -158,7 +158,7 @@ jQuery(function()
       // Get audio/video stream
 	  navigator.mediaDevices.getUserMedia(
 	  {
-		audio: true,
+		audio: false,
 		//video: true
 		video: { width: 1920, height: 960 }
 	  }).then(function(stream)
