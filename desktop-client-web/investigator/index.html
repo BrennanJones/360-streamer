@@ -148,11 +148,6 @@
   <h2>Investigator Statuses and Controls</h2>
 
   <div>
-    <p><b>Enter Pair ID:</b> <input id="pairIDTextField" type="text" name="pairIDTextField" value=""><input id="submitPairIDButton" type="button" value="Submit pair ID" onclick="updatePairID();"></p>
-    <p id="pairIDStr"><b>Pair ID:</b> --</p>
-  </div>
-
-  <div>
     <h3>Client Statuses</h3>
     <p id="broadcasterStatusStr"><b>Broadcaster:</b> --</p>
     <p id="viewerStatusStr"><b>Viewer:</b> --</p>
@@ -164,7 +159,12 @@
     <p><input id="restartCallButton" type="button" value="Start/restart call" onclick="startCall();"> <input id="endCallButton" type="button" value="End call" onclick="endCall();"></p>
   </div>
 
-  <div>
+  <div style="visibility: hidden">
+    <p><b>Enter Pair ID:</b> <input id="pairIDTextField" type="text" name="pairIDTextField" value=""><input id="submitPairIDButton" type="button" value="Submit pair ID" onclick="updatePairID();"></p>
+    <p id="pairIDStr"><b>Pair ID:</b> --</p>
+  </div>
+
+  <div style="visibility: hidden">
     <h3>Task Stage</h3>
     <div id="taskStageBeginButtonsDiv">
       <p><input id="geocache1BeginButton" type="button" value="Begin Geocache 1" onclick="taskStageBegin('Geocache1');"></p>
