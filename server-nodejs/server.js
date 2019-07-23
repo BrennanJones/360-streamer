@@ -44,7 +44,7 @@ app.listen(8082);
 var serverStartedDate = Date.now();
 console.log('Server started. [' + (new Date()).toString() + ']');
 
-filesystem.mkdirSync('./data/' + serverStartedDate);
+//filesystem.mkdirSync('./data/' + serverStartedDate);
 
 
 /* CLIENT SOCKET SESSION IDs */
@@ -58,7 +58,7 @@ var viewerClientPeerID;
 var callIsOnline = false;
 
 /* LOG FILE */
-var logFileWriteStream = filesystem.createWriteStream('data/' + serverStartedDate + '/log.csv');
+//var logFileWriteStream = filesystem.createWriteStream('data/' + serverStartedDate + '/log.csv');
 
 /* LOGGED INFORMATION */
 var pairID;
@@ -220,18 +220,18 @@ io.sockets.on('connection', function(socket)
 		callIsOnline = true;
 		io.sockets.emit('CallOnline');
 
-		logFileWriteStream.write(
-			pairID + ',' +
-			Date.now() + ',' +
-			(new Date()).toString() + ',' +
-			'ModeSwitch' + ',' +
-			'360Mode' + ',' +
-			',' +
-			',' +
-			',' +
-			',' +
-			',' +
-			taskStage + '\n' );
+		// logFileWriteStream.write(
+		// 	pairID + ',' +
+		// 	Date.now() + ',' +
+		// 	(new Date()).toString() + ',' +
+		// 	'ModeSwitch' + ',' +
+		// 	'360Mode' + ',' +
+		// 	',' +
+		// 	',' +
+		// 	',' +
+		// 	',' +
+		// 	',' +
+		// 	taskStage + '\n' );
 	});
 
 	socket.on('CallOffline', function(data)
@@ -241,18 +241,18 @@ io.sockets.on('connection', function(socket)
 		callIsOnline = false;
 		io.sockets.emit('CallOffline');
 
-		logFileWriteStream.write(
-			pairID + ',' +
-			Date.now() + ',' +
-			(new Date()).toString() + ',' +
-			'ModeSwitch' + ',' +
-			'StandardMode' + ',' +
-			',' +
-			',' +
-			',' +
-			',' +
-			',' +
-			taskStage + '\n' );
+		// logFileWriteStream.write(
+		// 	pairID + ',' +
+		// 	Date.now() + ',' +
+		// 	(new Date()).toString() + ',' +
+		// 	'ModeSwitch' + ',' +
+		// 	'StandardMode' + ',' +
+		// 	',' +
+		// 	',' +
+		// 	',' +
+		// 	',' +
+		// 	',' +
+		// 	taskStage + '\n' );
 	});
 
 
@@ -294,36 +294,36 @@ io.sockets.on('connection', function(socket)
 		taskStage = data;
 		io.sockets.emit('TaskStageBegin', taskStage);
 
-		logFileWriteStream.write(
-			pairID + ',' +
-			Date.now() + ',' +
-			(new Date()).toString() + ',' +
-			'TaskStageBegin' + ',' +
-			(callIsOnline ? '360Mode' : 'StandardMode') + ',' +
-			',' +
-			',' +
-			',' +
-			',' +
-			',' +
-			taskStage + '\n' );
+		// logFileWriteStream.write(
+		// 	pairID + ',' +
+		// 	Date.now() + ',' +
+		// 	(new Date()).toString() + ',' +
+		// 	'TaskStageBegin' + ',' +
+		// 	(callIsOnline ? '360Mode' : 'StandardMode') + ',' +
+		// 	',' +
+		// 	',' +
+		// 	',' +
+		// 	',' +
+		// 	',' +
+		// 	taskStage + '\n' );
 	});
 
 	socket.on('I_TaskStageEnd', function()
 	{
 		console.log('I_TaskStageEnd [' + (new Date()).toString() + ']');
 
-		logFileWriteStream.write(
-			pairID + ',' +
-			Date.now() + ',' +
-			(new Date()).toString() + ',' +
-			'TaskStageEnd' + ',' +
-			(callIsOnline ? '360Mode' : 'StandardMode') + ',' +
-			',' +
-			',' +
-			',' +
-			',' +
-			',' +
-			taskStage + '\n' );
+		// logFileWriteStream.write(
+		// 	pairID + ',' +
+		// 	Date.now() + ',' +
+		// 	(new Date()).toString() + ',' +
+		// 	'TaskStageEnd' + ',' +
+		// 	(callIsOnline ? '360Mode' : 'StandardMode') + ',' +
+		// 	',' +
+		// 	',' +
+		// 	',' +
+		// 	',' +
+		// 	',' +
+		// 	taskStage + '\n' );
 
 		taskStage = 'NONE';
 		io.sockets.emit('TaskStageEnd');
@@ -334,18 +334,18 @@ io.sockets.on('connection', function(socket)
 
 	socket.on('LogCameraInfo', function(cameraInfo)
 	{
-		logFileWriteStream.write(
-			pairID + ',' +
-			Date.now() + ',' +
-			(new Date()).toString() + ',' +
-			'UpdatedCameraInfo' + ',' +
-			/* (callIsOnline ? '360Mode' : 'StandardMode') */ '360Mode' + ',' +
-			cameraInfo.worldDirection.x + ',' +
-			cameraInfo.worldDirection.y + ',' +
-			cameraInfo.worldDirection.z + ',' +
-			cameraInfo.fov + ',' +
-			cameraInfo.aspect + ',' +
-			taskStage + '\n' );
+		// logFileWriteStream.write(
+		// 	pairID + ',' +
+		// 	Date.now() + ',' +
+		// 	(new Date()).toString() + ',' +
+		// 	'UpdatedCameraInfo' + ',' +
+		// 	/* (callIsOnline ? '360Mode' : 'StandardMode') */ '360Mode' + ',' +
+		// 	cameraInfo.worldDirection.x + ',' +
+		// 	cameraInfo.worldDirection.y + ',' +
+		// 	cameraInfo.worldDirection.z + ',' +
+		// 	cameraInfo.fov + ',' +
+		// 	cameraInfo.aspect + ',' +
+		// 	taskStage + '\n' );
 	});
 
 
