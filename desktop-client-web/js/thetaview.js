@@ -209,7 +209,19 @@ class ThetaView
 
     this._clock = new THREE.Clock();
 
-    this._animate();
+    //this._animate();
+	
+	document.body.appendChild( WEBVR.createButton( this._renderer ) );
+	this._renderer.vr.enabled = true;
+	
+	var scene = this._scene;
+	var camera = this._camera;
+	var renderer = this._renderer;
+	this._renderer.setAnimationLoop( function () {
+
+		renderer.render( scene, camera );
+
+	} );
   }
 
   stop(videoDOM)
