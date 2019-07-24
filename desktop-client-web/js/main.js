@@ -182,12 +182,12 @@ jQuery(function()
     {
       socket.emit('CallOffline');
       
-      if (recordingStarted)
-      {
-        stopRecording();
-        recordingStarted = false;
-        download();
-      }
+      // if (recordingStarted)
+      // {
+      //   //stopRecording();
+      //   //recordingStarted = false;
+      //   //download();
+      // }
     }
     else // if (window.clientType == 'Viewer')
     {
@@ -218,8 +218,8 @@ jQuery(function()
       mediaSource = new MediaSource();
       mediaSource.addEventListener('sourceopen', handleSourceOpen, false);
 
-      startRecording();
-      recordingStarted = true;
+      //startRecording();
+      //recordingStarted = true;
 
       // setTimeout(recordPoll, 2000);
     }

@@ -37,7 +37,14 @@ class ThetaView
 
   _render(dt)
   {
-    this._effect.render(this._scene, this._camera);
+    if (this._isMobile)
+    {
+      this._effect.render(this._scene, this._camera);
+    }
+    else
+    {
+      this._renderer.render(this._scene, this._camera);
+    }
   }
 
   _fullscreen()
@@ -104,6 +111,11 @@ class ThetaView
     // this._scene.add( line );
   }
 
+  animate()
+  {
+    this._animate();
+  }
+
   constructor()
   {
     this._camera = null;
@@ -149,7 +161,7 @@ class ThetaView
     sphereMat.side = THREE.BackSide;
     var cube = new THREE.Mesh(cubeGeometry, sphereMat);
     cube.scale.x = -1;
-    cube.rotation.y = 0;
+    cube.rotation.y = Math.PI / 2;
 
     this._scene.add(cube);
 
@@ -167,6 +179,25 @@ class ThetaView
     
     // this._addShape(arrowShape, 0xffffff, -10, -50, 50, Math.PI/2, 0, 0, 1/2);     // fill
     // this._addLineShape(arrowShape, 0x000000, -10, -50, 50, Math.PI/2, 0, 0, 1/2)  // stroke
+
+    // // model
+    // var loader = new FBXLoader();
+    // loader.load('../models/robot.fbx', function ( robotModel ) {
+
+    //   robotModel.traverse( function ( child ) {
+
+    //     if ( child.isMesh ) {
+
+    //       child.castShadow = true;
+    //       child.receiveShadow = true;
+
+    //     }
+
+    //   } );
+
+    //   this._scene.add( robotModel );
+
+    // } );
 
     // Create the renderer
 
@@ -215,17 +246,20 @@ class ThetaView
     }
     else
     {
-      document.body.appendChild( WEBVR.createButton( this._renderer ) );
+      document.body.appendChild(WEBVR.createButton(this._renderer));
       this._renderer.vr.enabled = true;
       
       var scene = this._scene;
       var camera = this._camera;
       var renderer = this._renderer;
       this._renderer.setAnimationLoop( function () {
+        renderer.render(scene, camera);
+      });
 
-        renderer.render( scene, camera );
-
-      } );
+      // var thisThetaView = this;
+      // this._renderer.setAnimationLoop( function () {
+      //   thisThetaView.animate();
+      // });
     }
   }
 
