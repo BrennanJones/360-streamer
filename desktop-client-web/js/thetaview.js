@@ -167,7 +167,8 @@ class ThetaView
 
     // Forward reference arrow
     
-    // var arrowShape = new THREE.Shape();
+    var arrowShape = new THREE.Shape();
+    
     // arrowShape.moveTo( 0, 0 );
     // arrowShape.lineTo( 0, 60 );
     // arrowShape.lineTo( -20, 60 );
@@ -177,27 +178,54 @@ class ThetaView
     // arrowShape.lineTo( 40, 0 );
     // arrowShape.lineTo( 0, 0 );  // close path
     
-    // this._addShape(arrowShape, 0xffffff, -10, -50, 50, Math.PI/2, 0, 0, 1/2);     // fill
-    // this._addLineShape(arrowShape, 0x000000, -10, -50, 50, Math.PI/2, 0, 0, 1/2)  // stroke
+    arrowShape.moveTo( 0, -150 );
+    arrowShape.lineTo( 0, -210 );
+    arrowShape.lineTo( -20, -210 );
+    arrowShape.lineTo( 20, -250 );
+    arrowShape.lineTo( 60, -210 );
+    arrowShape.lineTo( 40, -210 );
+    arrowShape.lineTo( 40, -150 );
+    arrowShape.lineTo( 0, -150 );  // close path
+    
+    this._addShape(arrowShape, 0xffffff, -10, -50, 50, Math.PI/2, 0, 0, 1/2);     // fill
+    //this._addLineShape(arrowShape, 0x000000, -10, -50, 50, Math.PI/2, 0, 0, 1/2)  // stroke
 
-    // // model
-    // var loader = new FBXLoader();
-    // loader.load('../models/robot.fbx', function ( robotModel ) {
+    // Robot model
 
-    //   robotModel.traverse( function ( child ) {
+    // var robotModel;
+    // var robotPosX = -0.25;
+    // var robotPosY = 1.65;
+    // var robotPosZ = -1.5;
+    // var robotRotX = 0;
+    // var robotRotY = 0;
+    // var robotRotZ = 0;
+    // var robotScaleX = 1;
+    // var robotScaleY = 1;
+    // var robotScaleZ = 1;
 
-    //     if ( child.isMesh ) {
+    // function robotResetPosRot()
+    // {
+    //   robotModel.rotation.set(robotRotX, robotRotY, robotRotZ);
+    //   robotModel.position.set(robotPosX, robotPosY, robotPosZ);
+    //   robotModel.scale.set(robotScaleX, robotScaleY, robotScaleZ);
+    // }
 
-    //       child.castShadow = true;
-    //       child.receiveShadow = true;
+    // var scene = this._scene;
+    // var gltfLoader = new THREE.GLTFLoader();
+    // gltfLoader.load('../models/robot.glb', function (gltf)
+    // {
+    //   robotModel = gltf.scene;
+    //   scene.add(robotModel);
 
-    //     }
+    //   robotResetPosRot();
+    // },
+    // undefined, function (error)
+    // {
+    //   console.error("Error loading 3D model: " + error);
+    // });
 
-    //   } );
-
-    //   this._scene.add( robotModel );
-
-    // } );
+    // var light = new THREE.AmbientLight( 0xFFFFFF ); // soft white light
+    // this._scene.add( light );
 
     // Create the renderer
 
@@ -212,6 +240,9 @@ class ThetaView
     this._container.appendChild(this._element);
     const dom = videoDOM;
     dom.style.display = 'none';
+
+    this._renderer.gammaOutput = true;
+    this._renderer.gammaFactor = 1.5;
 
     // VR stuff
 
@@ -261,6 +292,32 @@ class ThetaView
       //   thisThetaView.animate();
       // });
     }
+
+    // document.onkeydown = function(e)
+    // {
+    //   if (e.which == 37) // left
+    //   {
+    //     robotRotY += 0.05;
+    //   }
+    //   else if (e.which == 39) // right
+    //   {
+    //     robotRotY -= 0.05;
+    //   }
+    //   else if (e.which == 38) // up
+    //   {
+    //     robotScaleX += 0.01;
+    //     robotScaleY += 0.01;
+    //     robotScaleZ += 0.01;
+    //   }
+    //   else if (e.which == 40) // down
+    //   {
+    //     robotScaleX -= 0.01;
+    //     robotScaleY -= 0.01;
+    //     robotScaleZ -= 0.01;
+    //   }
+
+    //   robotResetPosRot();
+    // };
   }
 
   stop(videoDOM)
